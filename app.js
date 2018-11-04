@@ -10,37 +10,33 @@ GAME RULES:
 /*
 3 Challenges
 
-1. A player loses his entire score when he rolls 2 6s in a row. After that it's the next players turn.
+1. A player loses his ENTIRE score when he rolls two 6s in a row. After that it's the next players turn.
+2. Add an input field to the HTML where players can set the winning score (before a game only?)
 */
 
 var scores, roundScore, activePlayer, winningScore, gamePlaying;
-
-init();
-
+var previousRoll = 0;
 var diceDOM = document.querySelector('.dice');
 
-//var currentPlayer = document.querySelector('#current-' + activePlayer);
+init();
 
 // Roll dice 
 document.querySelector('.btn-roll').addEventListener('click', function() {
   if (gamePlaying) {
-    // Get a random number between 1 and 6
     var dice = Math.floor((Math.random() * 6) + 1);
 
-    // Display the dice
     diceDOM.style.display = 'block';
-    //  diceDOM.src = 'dice-' + dice + '.png'; // Can use .src or .setAttribute
     diceDOM.setAttribute('src', 'dice-' + dice + '.png');
 
-    // Update the round score ONLY IF the round score was not a 1
     if (dice !== 1) {
-      // Increment players score
       roundScore += dice;
-      // Have to select this here rather than assign it to a variable outside the function.
-      // If you do that, the Id is set at that point and is unaffected by the change of 
-      // activePlayer in the else statement.
       document.querySelector('#current-' + activePlayer).textContent = roundScore;
-      // currentPlayer.textContent = roundScore;
+      if (dice === 6 && previousRoll === 6) {
+        scores[activePlayer] = 0;
+        document.getElementById('score-' + activePlayer).textContent = scores[activePlayer];
+        nextPlayer();
+      }
+      previousRoll = dice;
     } else {
       nextPlayer();
     }
@@ -50,11 +46,9 @@ document.querySelector('.btn-roll').addEventListener('click', function() {
 // Hold score
 document.querySelector('.btn-hold').addEventListener('click', function() {
   if (gamePlaying) {
-    // Add CURRENT score to GLOBAL score
     scores[activePlayer] += roundScore;
-    // Update the UI
     document.getElementById('score-' + activePlayer).textContent = scores[activePlayer];
-    // Check if player won the game
+    
     if (scores[activePlayer] >= winningScore) {
       gamePlaying = false;
       document.getElementById('name-' + activePlayer).textContent = 'You Won!';
@@ -74,7 +68,7 @@ function init() {
   scores = [0,0];
   roundScore = 0;
   activePlayer = 0;
-  winningScore = 20;
+  winningScore = 50;
   gamePlaying = true;
 
   document.querySelector('.dice').style.display = 'none';
@@ -104,7 +98,3 @@ function nextPlayer() {
     diceDOM.style.display = 'none';
 }
 
-
-
-
-//document.querySelector('#current-' + activePlayer).textContent = dice;
